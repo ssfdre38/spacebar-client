@@ -1,4 +1,4 @@
-import SpacebarLogoBlue from "@assets/images/logo/pb-long-logo.png";
+import SpacebarLogoBlue from "@assets/images/logo/Logo-Blue.svg?react";
 import Button from "@components/Button";
 import Container from "@components/Container";
 import { useAppStore } from "@hooks/useAppStore";
