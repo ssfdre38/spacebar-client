@@ -1,40 +1,40 @@
 import {
-	APIGuildMember,
-	APIMessage,
-	ChannelType,
-	GatewayActivity,
-	GatewayChannelCreateDispatchData,
-	GatewayChannelDeleteDispatchData,
-	GatewayChannelUpdateDispatchData,
-	GatewayCloseCodes,
-	GatewayDispatchEvents,
-	GatewayDispatchPayload,
-	GatewayGuild,
-	GatewayGuildCreateDispatchData,
-	GatewayGuildDeleteDispatchData,
-	GatewayGuildMemberAddDispatchData,
-	GatewayGuildMemberListUpdateDispatchData,
-	GatewayGuildMemberRemoveDispatchData,
-	GatewayGuildMemberUpdateDispatchData,
-	GatewayGuildModifyDispatchData,
-	GatewayHeartbeat,
-	GatewayHelloData,
-	GatewayIdentify,
-	GatewayLazyRequest,
-	GatewayLazyRequestData,
-	GatewayMessageCreateDispatchData,
-	GatewayMessageDeleteBulkDispatchData,
-	GatewayMessageDeleteDispatchData,
-	GatewayMessageUpdateDispatchData,
-	GatewayOpcodes,
-	GatewayPresenceUpdateDispatchData,
-	GatewayReadyDispatchData,
-	GatewayReceivePayload,
-	GatewaySendPayload,
-	GatewayTypingStartDispatchData,
-	GatewayUserUpdateDispatchData,
-	PresenceUpdateStatus,
-	Snowflake,
+    APIGuildMember,
+    APIMessage,
+    ChannelType,
+    GatewayActivity,
+    GatewayChannelCreateDispatchData,
+    GatewayChannelDeleteDispatchData,
+    GatewayChannelUpdateDispatchData,
+    GatewayCloseCodes,
+    GatewayDispatchEvents,
+    GatewayDispatchPayload,
+    GatewayGuild,
+    GatewayGuildCreateDispatchData,
+    GatewayGuildDeleteDispatchData,
+    GatewayGuildMemberAddDispatchData,
+    GatewayGuildMemberListUpdateDispatchData,
+    GatewayGuildMemberRemoveDispatchData,
+    GatewayGuildMemberUpdateDispatchData,
+    GatewayGuildModifyDispatchData,
+    GatewayHeartbeat,
+    GatewayHelloData,
+    GatewayIdentify,
+    GatewayLazyRequest,
+    GatewayLazyRequestData,
+    GatewayMessageCreateDispatchData,
+    GatewayMessageDeleteBulkDispatchData,
+    GatewayMessageDeleteDispatchData,
+    GatewayMessageUpdateDispatchData,
+    GatewayOpcodes,
+    GatewayPresenceUpdateDispatchData,
+    GatewayReadyDispatchData,
+    GatewayReceivePayload,
+    GatewaySendPayload,
+    GatewayTypingStartDispatchData,
+    GatewayUserUpdateDispatchData,
+    PresenceUpdateStatus,
+    Snowflake,
 } from "@spacebarchat/spacebar-api-types/v9";
 import { debounce, Logger } from "@utils";
 import { action, makeAutoObservable, observable, runInAction } from "mobx";
@@ -145,7 +145,8 @@ export default class GatewayConnectionStore {
 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelCreate, this.onChannelCreate);
 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelUpdate, this.onChannelUpdate);
 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelDelete, this.onChannelDelete);
-		// @ts-expect-error missing event in typings
+		// missing event in typings - ignore
+		// @ts-ignore
 		this.dispatchHandlers.set("MESSAGE_ACK", this.onMessageAck);
 
 		this.dispatchHandlers.set(GatewayDispatchEvents.MessageCreate, this.onMessageCreate);
@@ -165,7 +166,13 @@ export default class GatewayConnectionStore {
 		this.readyState = WebSocket.OPEN;
 		this.reconnectTimeout = 0;
 
-		this.handleIdentify();
+		// If we have an existing session id, try to resume; otherwise identify as a new session.
+		if (this.sessionId) {
+			this.logger.debug("Attempting to resume existing session");
+			this.handleResume();
+		} else {
+			this.handleIdentify();
+		}
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,7 +305,7 @@ export default class GatewayConnectionStore {
 
 	private handleHello = (data: GatewayHelloData) => {
 		this.heartbeatInterval = data.heartbeat_interval;
-		this.reconnectTimeout = this.heartbeatInterval;
+		this.reconnectTimeout = this.heartbeatInterval ?? RECONNECT_TIMEOUT;
 		this.logger.info(
 			`[Hello] heartbeat interval: ${data.heartbeat_interval} (took ${Date.now() - this.connectionStartTime!}ms)`,
 		);
@@ -339,18 +346,33 @@ export default class GatewayConnectionStore {
 		// dont reconnect on "going away"
 		if (code === 1001) return;
 
-		// if (this.reconnectTimeout === 0) this.reconnectTimeout = RECONNECT_TIMEOUT;
-		// else this.reconnectTimeout += RECONNECT_TIMEOUT;
+		// If the code indicates we should not attempt to reconnect, bail out.
+		if (!this.canReconnect(code as GatewayCloseCodes | undefined)) {
+			this.logger.warn(`Close code ${code} is non-reconnectable; not attempting reconnect.`);
+			return;
+		}
 
-		// this.logger.debug(
-		// 	`Websocket closed with code ${code}; Will reconnect in ${(this.reconnectTimeout / 1000).toFixed(
-		// 		2,
-		// 	)} seconds.`,
-		// );
+		// initialize reconnect timeout if unset (start small), otherwise apply exponential backoff
+		if (this.reconnectTimeout === 0) this.reconnectTimeout = RECONNECT_TIMEOUT;
+		else this.reconnectTimeout = Math.min(this.reconnectTimeout * 2, 60000); // cap at 60s
 
-		alert(`Gateway connection closed with code ${code}, please refresh the page`);
+		this.logger.debug(
+			`Websocket closed with code ${code}; Will reconnect in ${(this.reconnectTimeout / 1000).toFixed(2)} seconds.`,
+		);
 
-		// this.startReconnect();
+		// show a gentle notice to the user (non-blocking) and then attempt reconnect
+		try {
+			// prefer a non-blocking UI notification; fallback to console if unavailable
+			if (typeof window !== "undefined" && (window as any).toast) {
+				(window as any).toast(`Gateway connection lost; attempting to reconnect...`);
+			} else {
+				this.logger.info("Gateway connection lost; attempting to reconnect...");
+			}
+		} catch (e) {
+			this.logger.debug("Could not show toast for reconnect notice", e);
+		}
+
+		this.startReconnect();
 	};
 
 	/**
