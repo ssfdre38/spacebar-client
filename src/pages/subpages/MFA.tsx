@@ -1,4 +1,4 @@
-import SpacebarLogoBlue from "@assets/images/logo/pb-long-logo.png?react";
+import SpacebarLogoBlue from "@assets/images/logo/Logo-Blue.svg?react";
 import {
 	AuthContainer,
 	FormContainer,
