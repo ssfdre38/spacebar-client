@@ -6,10 +6,10 @@ export interface RouteSettings {
 }
 
 export const DefaultRouteSettings: RouteSettings = {
-	api: "https://api.old.server.spacebar.chat/api",
-	cdn: "https://cdn.old.server.spacebar.chat",
-	gateway: "wss://gateway.old.server.spacebar.chat",
-	wellknown: "https://spacebar.chat",
+	api: "https://chat.pepperboxgaming.xyz/api/v9",
+	cdn: "https://chat.pepperboxgaming.xyz",
+	gateway: "wss://chat.peperboxgaming.xyz",
+	wellknown: "https://chat.pepperboxgaming.xyz",
 };
 
 // TODO: we should probably make our own

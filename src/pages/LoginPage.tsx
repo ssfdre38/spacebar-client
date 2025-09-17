@@ -1,4 +1,5 @@
-import SpacebarLogoBlue from "@assets/images/logo/Logo-Blue.svg?react";
+import { useInstanceValidation } from "@/hooks/useInstanceValidation";
+import SpacebarLogoBlue from "@assets/images/logo/pb-long-logo.png?react";
 import {
 	AuthContainer,
 	AuthSwitchPageContainer,
@@ -29,15 +30,12 @@ import {
 	IAPILoginResponse,
 	IAPILoginResponseError,
 	IAPILoginResponseMFARequired,
-	messageFromFieldError,
-	REST,
-	RouteSettings,
+	messageFromFieldError
 } from "@utils";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import MFA from "./subpages/MFA";
-import { useInstanceValidation } from "@/hooks/useInstanceValidation";
 
 type FormValues = {
 	login: string;

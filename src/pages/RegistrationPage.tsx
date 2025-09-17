@@ -1,5 +1,5 @@
 import { useInstanceValidation } from "@/hooks/useInstanceValidation";
-import SpacebarLogoBlue from "@assets/images/logo/Logo-Blue.svg?react";
+import SpacebarLogoBlue from "@assets/images/logo/pb-long-logo.png?react";
 import {
 	AuthContainer,
 	AuthSwitchPageContainer,
