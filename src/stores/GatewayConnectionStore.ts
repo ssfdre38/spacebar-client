@@ -1,40 +1,40 @@
 import {
-    APIGuildMember,
-    APIMessage,
-    ChannelType,
-    GatewayActivity,
-    GatewayChannelCreateDispatchData,
-    GatewayChannelDeleteDispatchData,
-    GatewayChannelUpdateDispatchData,
-    GatewayCloseCodes,
-    GatewayDispatchEvents,
-    GatewayDispatchPayload,
-    GatewayGuild,
-    GatewayGuildCreateDispatchData,
-    GatewayGuildDeleteDispatchData,
-    GatewayGuildMemberAddDispatchData,
-    GatewayGuildMemberListUpdateDispatchData,
-    GatewayGuildMemberRemoveDispatchData,
-    GatewayGuildMemberUpdateDispatchData,
-    GatewayGuildModifyDispatchData,
-    GatewayHeartbeat,
-    GatewayHelloData,
-    GatewayIdentify,
-    GatewayLazyRequest,
-    GatewayLazyRequestData,
-    GatewayMessageCreateDispatchData,
-    GatewayMessageDeleteBulkDispatchData,
-    GatewayMessageDeleteDispatchData,
-    GatewayMessageUpdateDispatchData,
-    GatewayOpcodes,
-    GatewayPresenceUpdateDispatchData,
-    GatewayReadyDispatchData,
-    GatewayReceivePayload,
-    GatewaySendPayload,
-    GatewayTypingStartDispatchData,
-    GatewayUserUpdateDispatchData,
-    PresenceUpdateStatus,
-    Snowflake,
+	APIGuildMember,
+	APIMessage,
+	ChannelType,
+	GatewayActivity,
+	GatewayChannelCreateDispatchData,
+	GatewayChannelDeleteDispatchData,
+	GatewayChannelUpdateDispatchData,
+	GatewayCloseCodes,
+	GatewayDispatchEvents,
+	GatewayDispatchPayload,
+	GatewayGuild,
+	GatewayGuildCreateDispatchData,
+	GatewayGuildDeleteDispatchData,
+	GatewayGuildMemberAddDispatchData,
+	GatewayGuildMemberListUpdateDispatchData,
+	GatewayGuildMemberRemoveDispatchData,
+	GatewayGuildMemberUpdateDispatchData,
+	GatewayGuildModifyDispatchData,
+	GatewayHeartbeat,
+	GatewayHelloData,
+	GatewayIdentify,
+	GatewayLazyRequest,
+	GatewayLazyRequestData,
+	GatewayMessageCreateDispatchData,
+	GatewayMessageDeleteBulkDispatchData,
+	GatewayMessageDeleteDispatchData,
+	GatewayMessageUpdateDispatchData,
+	GatewayOpcodes,
+	GatewayPresenceUpdateDispatchData,
+	GatewayReadyDispatchData,
+	GatewayReceivePayload,
+	GatewaySendPayload,
+	GatewayTypingStartDispatchData,
+	GatewayUserUpdateDispatchData,
+	PresenceUpdateStatus,
+	Snowflake,
 } from "@spacebarchat/spacebar-api-types/v9";
 import { debounce, Logger } from "@utils";
 import { action, makeAutoObservable, observable, runInAction } from "mobx";
@@ -143,11 +143,11 @@ export default class GatewayConnectionStore {
 		this.dispatchHandlers.set(GatewayDispatchEvents.GuildMemberListUpdate, this.onGuildMemberListUpdate);
 
 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelCreate, this.onChannelCreate);
-		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelUpdate, this.onChannelUpdate);
-		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelDelete, this.onChannelDelete);
+ 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelUpdate, this.onChannelUpdate);
+ 		this.dispatchHandlers.set(GatewayDispatchEvents.ChannelDelete, this.onChannelDelete);
 		// missing event in typings - ignore
 		// @ts-ignore
-		this.dispatchHandlers.set("MESSAGE_ACK", this.onMessageAck);
+ 		this.dispatchHandlers.set("MESSAGE_ACK", this.onMessageAck);
 
 		this.dispatchHandlers.set(GatewayDispatchEvents.MessageCreate, this.onMessageCreate);
 		this.dispatchHandlers.set(GatewayDispatchEvents.MessageUpdate, this.onMessageUpdate);
@@ -166,13 +166,7 @@ export default class GatewayConnectionStore {
 		this.readyState = WebSocket.OPEN;
 		this.reconnectTimeout = 0;
 
-		// If we have an existing session id, try to resume; otherwise identify as a new session.
-		if (this.sessionId) {
-			this.logger.debug("Attempting to resume existing session");
-			this.handleResume();
-		} else {
-			this.handleIdentify();
-		}
+		this.handleIdentify();
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
