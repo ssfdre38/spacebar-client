@@ -1,7 +1,7 @@
 {
-	"author": "Spacebar",
+	"author": "Daniel Elliott (@ssfdre38)",
 	"bugs": {
-		"url": "https://github.com/spacebarchat/client/issues"
+		"url": "https://github.com/ssfdre38/spacebar-client/issues"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
@@ -103,12 +103,12 @@
 		"vite-plugin-progress": "^0.0.7",
 		"vite-plugin-svgr": "^4.3.0"
 	},
-	"homepage": "https://spacebar.chat",
+	"homepage": "https://chat.pepperboxgaming.xyz",
 	"license": "AGPL-3.0-only",
-	"name": "spacebar-client",
+	"name": "pepperbox-chat-client",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/spacebarchat/client.git"
+		"url": "git+https://github.com/ssfdre38/spacebar-client.git"
 	},
 	"scripts": {
 		"dev": "cross-env VITE_ENV_DEV=true vite --open",
